@@ -82,5 +82,41 @@ namespace ProjectService.Controllers
             return CreatedAtAction(nameof(GetIssueById), new { id = issue.Id }, _mapper.Map<IssueDto>(issue));
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<IssueDto>> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
+        {
+            var issue = await _context.Issues
+                .FirstOrDefaultAsync(i => i.Id == id);
+            if (issue == null)
+            {
+                return NotFound();
+            }
+            _mapper.Map(updateIssueDto, issue);
+            var result = await _context.SaveChangesAsync() > 0;
+            if (!result)
+            {
+                return BadRequest("Could not update issue");
+            }
+            return Ok(_mapper.Map<IssueDto>(issue));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteIssue(Guid id)
+        {
+            var issue = await _context.Issues
+                .FirstOrDefaultAsync(i => i.Id == id);
+            if (issue == null)
+            {
+                return NotFound();
+            }
+            _context.Issues.Remove(issue);
+            var result = await _context.SaveChangesAsync() > 0;
+            if (!result)
+            {
+                return BadRequest("Could not delete issue");
+            }
+            return Ok();
+        }
+
     }
 }
