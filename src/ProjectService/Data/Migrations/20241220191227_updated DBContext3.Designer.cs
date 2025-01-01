@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjectService.Data;
@@ -11,9 +12,11 @@ using ProjectService.Data;
 namespace ProjectService.Data.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    partial class ProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241220191227_updated DBContext3")]
+    partial class updatedDBContext3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,26 +24,6 @@ namespace ProjectService.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("ProjectService.Entities.Board", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("BoardName")
-                        .HasColumnType("text");
-
-                    b.Property<int>("BoardType")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Boards");
-                });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>
                 {
@@ -77,9 +60,6 @@ namespace ProjectService.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("AssigneeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("BoardId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ComponentId")
@@ -131,8 +111,6 @@ namespace ProjectService.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BoardId");
 
                     b.HasIndex("ComponentId");
 
@@ -390,10 +368,6 @@ namespace ProjectService.Data.Migrations
 
             modelBuilder.Entity("ProjectService.Entities.Issue", b =>
                 {
-                    b.HasOne("ProjectService.Entities.Board", null)
-                        .WithMany("Issues")
-                        .HasForeignKey("BoardId");
-
                     b.HasOne("ProjectService.Entities.Component", "Component")
                         .WithMany("Issues")
                         .HasForeignKey("ComponentId")
@@ -496,11 +470,6 @@ namespace ProjectService.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("ProjectService.Entities.Board", b =>
-                {
-                    b.Navigation("Issues");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>

@@ -26,6 +26,7 @@ namespace ProjectService.Entities
         public Guid ComponentId { get; set; }
         [ForeignKey(nameof(Sprint))]
         public Guid SprintId { get; set; }
+        public string IssueKey { get; set; }
         public string Summary { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

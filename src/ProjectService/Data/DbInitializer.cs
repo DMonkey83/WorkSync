@@ -96,6 +96,7 @@ namespace ProjectService.Data
                     ComponentId = Guid.Parse("9eabb140-f2aa-4fa7-8caf-9aa6fac73a05"),
                     Description = "Issue 1 Description",
                     CreatedAt = DateTime.UtcNow,
+                    IssueKey = "PROJ1-1",
                     ProjectId = Guid.Parse("8234ac1b-3f4b-4b1e-9e3b-3f4b4b1e9e3b"),
                     DueDate = DateTime.UtcNow.AddDays(30),
                     IssueTypeId = Guid.Parse("8234ac1b-3f4b-4b1e-9e3b-3f4b4b1e9e3b"),
