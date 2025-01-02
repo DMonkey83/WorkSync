@@ -74,16 +74,28 @@ namespace ProjectService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<IssueDto>> CreateIssue(CreateIssueDto createIssueDto)
+        public async Task<ActionResult<IssueDto>> CreateIssue([FromBody] CreateIssueDto createIssueDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var issue = _mapper.Map<Issue>(createIssueDto);
+            issue.Id = Guid.NewGuid();
+            issue.CreatedAt = DateTime.UtcNow;
+            issue.UpdatedAt = DateTime.UtcNow;
             _context.Issues.Add(issue);
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {
                 return BadRequest("Could not create issue");
             }
-            return CreatedAtAction(nameof(GetIssueById), new { id = issue.Id }, _mapper.Map<IssueDto>(issue));
+            var createdIssue = await _context.Issues
+                .Include(x => x.IssuePriority)
+                .Include(x => x.IssueStatus)
+                .Include(x => x.IssueType)
+                .FirstOrDefaultAsync(i => i.Id == issue.Id);
+            return CreatedAtAction(nameof(GetIssueById), new { id = issue.Id }, _mapper.Map<IssueDto>(createdIssue));
         }
 
         [HttpPut("{id}")]

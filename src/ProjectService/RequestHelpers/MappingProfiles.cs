@@ -23,6 +23,7 @@ namespace ProjectService.RequestHelpers
             CreateMap<IssueCustomField, IssueCustomFieldDto>();
             CreateMap<IssueLabel, IssueLabelDto>();
             CreateMap<IssuePriority, IssuePriorityDto>();
+            CreateMap<IssueSequence, IssueSequenceDto>();
             CreateMap<IssueStatus, IssueStatusDto>();
             CreateMap<IssueType, IssueTypeDto>();
             CreateMap<CreateIssueCommentDto, IssueComment>();
@@ -39,6 +40,12 @@ namespace ProjectService.RequestHelpers
                 .ForMember(dest => dest.IssueLabels, opt => opt.MapFrom(src => src.IssueLabels))
                 .ForMember(dest => dest.IssueComments, opt => opt.MapFrom(src => src.IssueComments))
                 .ForMember(dest => dest.IssueCustomFields, opt => opt.MapFrom(src => src.IssueCustomFields));
+            // New mapping for creating an issue
+            CreateMap<CreateIssueDto, Issue>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()) // Assuming ID is auto-generated
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Handle timestamps in service or database
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IssueCustomFields, opt => opt.Ignore());
         }
         
     } //

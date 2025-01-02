@@ -30,7 +30,7 @@ namespace ProjectService.Data
                 .WithMany(p => p.Components) // Inverse navigation to Components
                 .HasForeignKey(c => c.ProjectId) // Foreign key in Components
                 .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
-            
+
 
             modelBuilder.Entity<Project>()
                 .HasIndex(p => p.ProjectKey)
@@ -53,13 +53,13 @@ namespace ProjectService.Data
                 .WithMany(p => p.IssueLabels) // inverse navigation to issues
                 .HasForeignKey(c => c.IssueId) // Foreign key in Components
                 .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
-            
+
             modelBuilder.Entity<IssueComment>()
                 .HasOne(i => i.Issue) // navigation property to issues
                 .WithMany(p => p.IssueComments) // inverse navigation to issues
                 .HasForeignKey(c => c.IssueId) // Foreign key in Components
                 .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
-            
+
             modelBuilder.Entity<IssueCustomField>()
                 .HasOne(i => i.Issue) // navigation property to issues
                 .WithMany(p => p.IssueCustomFields) // inverse navigation to issues
@@ -93,33 +93,39 @@ namespace ProjectService.Data
             return await base.SaveChangesAsync(cancellationToken);
         }
 
+        private readonly object _lock = new object();
+
         private void GeneratedIssueKeys()
         {
-            var newIssues = ChangeTracker.Entries<Issue>()
-                .Where(e => e.State == EntityState.Added && string.IsNullOrEmpty(e.Entity.IssueKey))
-                .Select(e => e.Entity);
-            
-            foreach (var issue in newIssues)
+            lock (_lock)
             {
-                var project = Projects.Find(issue.ProjectId);
-                if (project == null)
-                {
-                    throw new InvalidOperationException("Project not found");
-                }
+                var newIssues = ChangeTracker.Entries<Issue>()
+                    .Where(e => e.State == EntityState.Added && string.IsNullOrEmpty(e.Entity.IssueKey))
+                    .Select(e => e.Entity)
+                    .ToList();
 
-                var issueSequence = IssueSequences.FirstOrDefault(seq => seq.ProjectId == project.Id);
-                if (issueSequence == null)
+                foreach (var issue in newIssues)
                 {
-                    issueSequence = new IssueSequence 
+                    var project = Projects.Find(issue.ProjectId);
+                    if (project == null)
                     {
-                        ProjectId = issue.ProjectId,
-                        LastNumber = 0
-                    };
-                    IssueSequences.Add(issueSequence);
-                }
+                        throw new InvalidOperationException("Project not found");
+                    }
 
-                issueSequence.LastNumber++;
-                 issue.IssueKey = $"{project.ProjectKey}-{issueSequence.LastNumber:D4}"; // Format number with leading zeroes
+                    var issueSequence = IssueSequences.FirstOrDefault(seq => seq.ProjectId == project.Id);
+                    if (issueSequence == null)
+                    {
+                        issueSequence = new IssueSequence
+                        {
+                            ProjectId = issue.ProjectId,
+                            LastNumber = 0
+                        };
+                        IssueSequences.Add(issueSequence);
+                    }
+
+                    issueSequence.LastNumber++;
+                    issue.IssueKey = $"{project.ProjectKey}-{issueSequence.LastNumber:D4}";
+                }
             }
         }
     }
