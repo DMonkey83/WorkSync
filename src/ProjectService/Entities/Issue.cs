@@ -45,6 +45,6 @@ namespace ProjectService.Entities
         public IssueStatus IssueStatus { get; set; }
         public List<IssueLabel> IssueLabels { get; set; } = new List<IssueLabel>();
         public List<IssueComment> IssueComments { get; set; } = new List<IssueComment>();
-        public List<IssueCustomField> IssueCustomFields { get; set; } = new List<IssueCustomField>();
+        public ICollection<IssueCustomField> IssueCustomFields { get; set; }
     }
 }

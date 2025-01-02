@@ -7,6 +7,6 @@ namespace ProjectService.DTOs
 {
     public class CreateIssuePriorityDto
     {
-        
+        public string PriorityName { get; set; }
     }
 }

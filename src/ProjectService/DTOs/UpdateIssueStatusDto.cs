@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ProjectService.DTOs
 {
-    public class UpdateIssuePriorityDto
+    public class UpdateIssueStatusDto
     {
-        public string PriorityName { get; set; }
+        public string StatusName { get; set; }
     }
 }

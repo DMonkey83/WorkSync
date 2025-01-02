@@ -8,7 +8,7 @@ namespace ProjectService.DTOs
     public class UpdateIssueHistoryDto
     {
         
-        public Guid ChangedBy { get; set; }
+        public Guid? ChangedBy { get; set; }
         public string OldValue { get; set; }
         public string NewValue { get; set; }
     }

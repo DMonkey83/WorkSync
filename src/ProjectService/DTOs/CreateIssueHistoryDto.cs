@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ProjectService.DTOs
 {
-    public class IssueHistory
+    public class CreateIssueHistoryDto
     {
         public Guid IssueId { get; set; }
         public Guid ChangedBy { get; set; }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ProjectService.Data;
@@ -11,7 +7,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/customfields")]
     public class IssueCustomFieldController : ControllerBase
     {
         private readonly ProjectDbContext _context;
@@ -55,7 +51,10 @@ namespace ProjectService.Controllers
             {
                 return NotFound();
             }
-            _mapper.Map(updateIssueCustomFieldDto, issueCustomField);
+
+            issueCustomField.FieldName = updateIssueCustomFieldDto.FieldName ?? issueCustomField.FieldName;
+            issueCustomField.FieldValue = updateIssueCustomFieldDto.FieldValue ?? issueCustomField.FieldValue;
+
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {

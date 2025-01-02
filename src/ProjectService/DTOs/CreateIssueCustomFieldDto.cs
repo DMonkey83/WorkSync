@@ -8,7 +8,7 @@ namespace ProjectService.DTOs
     public class CreateIssueCustomFieldDto
     {
         public Guid IssueId { get; set; }
-        public Guid FieldName { get; set; }
+        public string FieldName { get; set; }
         public string FieldValue { get; set; }
     }
 }
