@@ -58,6 +58,8 @@ namespace ProjectService.Controllers
                 .Include(x => x.IssuePriority)
                 .Include(x => x.IssueStatus)
                 .Include(x => x.IssueType)
+                .Include(x => x.IssueComments)
+                .Include(x => x.IssueCustomFields)
                 .FirstOrDefaultAsync(i => i.IssueKey == key);
 
             if (issue == null)
