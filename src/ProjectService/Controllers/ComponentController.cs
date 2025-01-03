@@ -8,7 +8,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/components")]
     public class ComponentController : ControllerBase
     {
         private readonly ProjectDbContext _context;
@@ -64,7 +64,9 @@ namespace ProjectService.Controllers
             {
                 return NotFound();
             }
-            _mapper.Map(updateComponentDto, component);
+            component.ComponentName = updateComponentDto.ComponentName ?? component.ComponentName;
+            component.Description = updateComponentDto.Description ?? component.Description;
+            component.ProjectId = updateComponentDto.ProjectId ?? component.ProjectId;
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {

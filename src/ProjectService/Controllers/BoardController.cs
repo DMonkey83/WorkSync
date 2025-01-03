@@ -30,7 +30,7 @@ namespace ProjectService.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<BoardDto>>> GetBoardById(Guid id)
+        public async Task<ActionResult<BoardDto>> GetBoardById(Guid id)
         {
             var board = await _context.Boards
                 .FirstOrDefaultAsync(s => s.Id == id);

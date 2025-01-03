@@ -18,7 +18,15 @@ namespace ProjectService.RequestHelpers
             CreateMap<Component, ComponentDto>();
             CreateMap<CreateComponentDto, Component>();
             CreateMap<UpdateComponentDto, Component>();
-            CreateMap<Sprint, SprintDto>();
+            CreateMap<Sprint, SprintDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId))
+                .ForMember(dest => dest.Project, opt => opt.MapFrom(src => src.Project));
+            // New mapping for creating a sprint
+            CreateMap<CreateSprintDto, Sprint>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()) // Assuming ID is auto-generated
+                .ForMember(dest => dest.StartDate, opt => opt.Ignore()) // Handle timestamps in service or database
+                .ForMember(dest => dest.EndDate, opt => opt.Ignore());
             CreateMap<IssueComment, IssueCommentDto>();
             CreateMap<IssueCustomField, IssueCustomFieldDto>();
             CreateMap<IssueLabel, IssueLabelDto>();
@@ -46,6 +54,7 @@ namespace ProjectService.RequestHelpers
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Handle timestamps in service or database
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.IssueCustomFields, opt => opt.Ignore());
+
         }
         
     } //

@@ -4,16 +4,15 @@ namespace ProjectService.DTOs
 {
     public class CreateProjectDto
     {
-        [Required]        
+        [Required]
         public string ProjectName { get; set; }
-        [Required]        
+        [Required]
         public string ProjectKey { get; set; }
-        [Required]        
+        [Required]
         public string Description { get; set; }
-        [Required]        
+        [Required]
         public Guid LeadUserId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
     }
 }

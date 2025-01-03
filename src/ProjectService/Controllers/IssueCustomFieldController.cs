@@ -7,7 +7,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/customfields")]
+    [Route("api/custom-fields")]
     public class IssueCustomFieldController : ControllerBase
     {
         private readonly ProjectDbContext _context;

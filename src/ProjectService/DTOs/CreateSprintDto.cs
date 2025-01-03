@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 
 namespace ProjectService.DTOs
 {
-    public class UpdateSprintDto
+    public class CreateSprintDto
     {
+        public Guid ProjectId { get; set; }
         public string SprintName { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public string Status { get; set; }
-        public string Goal { get; set; } 
+        public string Goal { get; set; }
     }
 }

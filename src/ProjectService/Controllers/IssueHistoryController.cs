@@ -7,7 +7,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/issuehistory")]
+    [Route("api/issue-histories")]
     public class IssueHistoryController : ControllerBase
     {
         private readonly ProjectDbContext _context;

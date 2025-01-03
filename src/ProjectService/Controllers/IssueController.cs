@@ -102,12 +102,35 @@ namespace ProjectService.Controllers
         public async Task<ActionResult<IssueDto>> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
         {
             var issue = await _context.Issues
+                .Include(x => x.IssuePriority)
+                .Include(x => x.IssueStatus)
+                .Include(x => x.IssueType)
+                .Include(x => x.IssueComments)
+                .Include(x => x.IssueCustomFields)
+                .Include(x => x.Component)
+                .Include(x => x.Sprint)
+                .Include(x => x.Project)
                 .FirstOrDefaultAsync(i => i.Id == id);
             if (issue == null)
             {
                 return NotFound();
             }
-            _mapper.Map(updateIssueDto, issue);
+
+            issue.ComponentId = updateIssueDto.ComponentId ?? issue.ComponentId;
+            issue.Description = updateIssueDto.Description ?? issue.Description;
+            issue.PriorityId = updateIssueDto.PriorityId ?? issue.PriorityId;
+            issue.ProjectId = updateIssueDto.ProjectId ?? issue.ProjectId;
+            issue.SprintId = updateIssueDto.SprintId ?? issue.SprintId;
+            issue.StatusId = updateIssueDto.StatusId ?? issue.StatusId;
+            issue.Summary = updateIssueDto.Summary ?? issue.Summary;
+            issue.IssueTypeId = updateIssueDto.IssueTypeId ?? issue.IssueTypeId;
+            issue.UpdatedAt = DateTime.UtcNow;
+            issue.TimeSpent = updateIssueDto.TimeSpent ?? issue.TimeSpent;
+            issue.OriginalEstimate = updateIssueDto.OriginalEstimate ?? issue.OriginalEstimate;
+            issue.RemainingEstimate = updateIssueDto.RemainingEstimate ?? issue.RemainingEstimate;
+            issue.DueDate = updateIssueDto.DueDate ?? issue.DueDate;
+
+
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {
@@ -131,7 +154,7 @@ namespace ProjectService.Controllers
             {
                 return BadRequest("Could not delete issue");
             }
-            return Ok();
+            return Ok("Issue deleted $issue.IssueKey");
         }
 
     }

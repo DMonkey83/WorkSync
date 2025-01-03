@@ -8,7 +8,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/issue-comments")]
     public class IssueCommentController : ControllerBase
     {
         private readonly ProjectDbContext _context;

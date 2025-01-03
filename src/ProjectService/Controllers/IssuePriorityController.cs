@@ -8,7 +8,7 @@ using ProjectService.Entities;
 namespace ProjectService.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/issue-priorities")]
     public class IssuePriorityController : ControllerBase
     {
         private readonly ProjectDbContext _context;
