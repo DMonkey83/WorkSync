@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjectService.Data;
@@ -11,9 +12,11 @@ using ProjectService.Data;
 namespace ProjectService.Data.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    partial class ProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112180617_updated Issue table")]
+    partial class updatedIssuetable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Boards", (string)null);
+                    b.ToTable("Boards");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>
@@ -67,7 +70,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Components", (string)null);
+                    b.ToTable("Components");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Issue", b =>
@@ -76,7 +79,7 @@ namespace ProjectService.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("AssigneeId")
+                    b.Property<Guid>("AssigneeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("BoardId")
@@ -94,6 +97,9 @@ namespace ProjectService.Data.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("IssueId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("IssueKey")
                         .HasColumnType("text");
 
@@ -103,10 +109,10 @@ namespace ProjectService.Data.Migrations
                     b.Property<int>("OriginalEstimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("ParentIssueId")
+                    b.Property<Guid>("ParentIssueId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("PriorityId")
+                    b.Property<Guid>("PriorityId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ProjectId")
@@ -115,7 +121,7 @@ namespace ProjectService.Data.Migrations
                     b.Property<int>("RemainingEstimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("ReporterId")
+                    b.Property<Guid>("ReporterId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("SprintId")
@@ -139,9 +145,9 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("ComponentId");
 
-                    b.HasIndex("IssueTypeId");
+                    b.HasIndex("IssueId");
 
-                    b.HasIndex("ParentIssueId");
+                    b.HasIndex("IssueTypeId");
 
                     b.HasIndex("PriorityId");
 
@@ -151,7 +157,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Issues", (string)null);
+                    b.ToTable("Issues");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueComment", b =>
@@ -176,7 +182,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueComments", (string)null);
+                    b.ToTable("IssueComments");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueCustomField", b =>
@@ -198,7 +204,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueCustomFields", (string)null);
+                    b.ToTable("IssueCustomFields");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueHistory", b =>
@@ -229,7 +235,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueHistories", (string)null);
+                    b.ToTable("IssueHistories");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueLabel", b =>
@@ -248,7 +254,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueLabels", (string)null);
+                    b.ToTable("IssueLabels");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssuePriority", b =>
@@ -262,7 +268,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssuePriorities", (string)null);
+                    b.ToTable("IssuePriorities");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueSequence", b =>
@@ -279,7 +285,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueSequences", (string)null);
+                    b.ToTable("IssueSequences");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueStatus", b =>
@@ -293,7 +299,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueStatuses", (string)null);
+                    b.ToTable("IssueStatuses");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueType", b =>
@@ -310,7 +316,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueTypes", (string)null);
+                    b.ToTable("IssueTypes");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Project", b =>
@@ -348,7 +354,7 @@ namespace ProjectService.Data.Migrations
                     b.HasIndex("ProjectKey")
                         .IsUnique();
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Sprint", b =>
@@ -379,7 +385,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Sprints", (string)null);
+                    b.ToTable("Sprints");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>
@@ -405,21 +411,21 @@ namespace ProjectService.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjectService.Entities.Issue", null)
+                        .WithMany("SubIssues")
+                        .HasForeignKey("IssueId");
+
                     b.HasOne("ProjectService.Entities.IssueType", "IssueType")
                         .WithMany("Issues")
                         .HasForeignKey("IssueTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectService.Entities.Issue", "ParentIssue")
-                        .WithMany("SubIssues")
-                        .HasForeignKey("ParentIssueId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ProjectService.Entities.IssuePriority", "IssuePriority")
                         .WithMany("Issues")
                         .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ProjectService.Entities.Project", "Project")
                         .WithMany()
@@ -446,8 +452,6 @@ namespace ProjectService.Data.Migrations
                     b.Navigation("IssueStatus");
 
                     b.Navigation("IssueType");
-
-                    b.Navigation("ParentIssue");
 
                     b.Navigation("Project");
 

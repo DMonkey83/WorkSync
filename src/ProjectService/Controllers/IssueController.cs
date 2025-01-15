@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectService.Data;
@@ -35,6 +36,21 @@ namespace ProjectService.Controllers
             return _mapper.Map<List<IssueDto>>(issues);
         }
 
+        [HttpGet("subissues/{id}")]
+        public async Task<ActionResult<List<IssueDto>>> GetAllSubIssues(Guid id)
+        {
+            var issues = await _context.Issues
+                .Include(x => x.IssuePriority)
+                .Include(x => x.IssueStatus)
+                .Include(x => x.Component)
+                .Include(x => x.Sprint)
+                .Include(x => x.Project)
+                .Include(x => x.IssueType)
+                .Where(i => i.ParentIssueId == id)  // Use Where instead of AnyAsync
+                .ToListAsync();  // Convert to a list of issues
+            return _mapper.Map<List<IssueDto>>(issues);  // Map to a list of IssueDto
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<IssueDto>> GetIssueById(Guid id)
         {
@@ -43,6 +59,7 @@ namespace ProjectService.Controllers
                 .Include(x => x.IssueStatus)
                 .Include(x => x.IssueType)
                 .Include(x => x.IssueComments)
+                .Include(x => x.IssueLabels)
                 .Include(x => x.IssueCustomFields)
             .FirstOrDefaultAsync(i => i.Id == id);
             if (issue == null)

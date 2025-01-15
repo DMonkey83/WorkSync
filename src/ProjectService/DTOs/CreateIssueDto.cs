@@ -3,6 +3,7 @@ namespace ProjectService.DTOs
     public class CreateIssueDto
     {
         public Guid ProjectId { get; set; }
+        public Guid ParentIssueId { get; set; }
         public Guid IssueTypeId { get; set; }
         public Guid? ReporterId { get; set; }
         public Guid? AssigneeId { get; set; }

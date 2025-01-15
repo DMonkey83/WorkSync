@@ -1,9 +1,9 @@
-namespace ProjectService.DTOs
+using MongoDB.Entities;
+
+namespace SearchService.Models
 {
-    public class IssueDto
+    public class Issue: Entity
     {
-        public Guid Id { get; set; }
-        public Guid? ParentIssueId { get; set; }
         public string IssueKey { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }
@@ -16,8 +16,6 @@ namespace ProjectService.DTOs
         public string IssuePriorityName { get; set; }
         public string IssueStatusName { get; set; }
         public string IssueTypeName { get; set; }
-        public List<IssueLabelDto> IssueLabels { get; set; }
-        public List<IssueCommentDto> IssueComments { get; set; }
-        public List<IssueCustomFieldDto> IssueCustomFields { get; set; }
+        public List<IssueLabel> IssueLabels { get; set; }
     }
 }

@@ -14,12 +14,14 @@ namespace ProjectService.Entities
         public Guid Id { get; set; }
         [ForeignKey(nameof(Project))]
         public Guid ProjectId { get; set; }
+        [ForeignKey(nameof(Issue))]
+        public Guid? ParentIssueId { get; set; } = null;
         [ForeignKey(nameof(IssueType))]
         public Guid IssueTypeId { get; set; }
-        public Guid ReporterId { get; set; }
-        public Guid AssigneeId { get; set; }
+        public Guid? ReporterId { get; set; }
+        public Guid? AssigneeId { get; set; }
         [ForeignKey(nameof(IssuePriority))]
-        public Guid PriorityId { get; set; }
+        public Guid? PriorityId { get; set; }
         [ForeignKey(nameof(IssueStatus))]
         public Guid StatusId { get; set; }
         [ForeignKey(nameof(Component))]
@@ -43,6 +45,7 @@ namespace ProjectService.Entities
         public Sprint Sprint { get; set; }
         public IssuePriority IssuePriority { get; set; }
         public IssueStatus IssueStatus { get; set; }
+        public Issue ParentIssue { get; set; }
         public List<IssueLabel> IssueLabels { get; set; } = new List<IssueLabel>();
         public List<IssueComment> IssueComments { get; set; } = new List<IssueComment>();
         public ICollection<IssueCustomField> IssueCustomFields { get; set; }

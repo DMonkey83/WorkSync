@@ -60,7 +60,7 @@ namespace ProjectService.Controllers
                 return NotFound();
             }
             
-            issueType.IssueTypeName = updateIssueTypeDto.TypeName ?? issueType.IssueTypeName;
+            issueType.IssueTypeName = updateIssueTypeDto.IssueTypeName ?? issueType.IssueTypeName;
             issueType.Description = updateIssueTypeDto.Description ?? issueType.Description;
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)

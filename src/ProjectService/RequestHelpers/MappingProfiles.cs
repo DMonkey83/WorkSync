@@ -34,6 +34,7 @@ namespace ProjectService.RequestHelpers
             CreateMap<IssueSequence, IssueSequenceDto>();
             CreateMap<IssueStatus, IssueStatusDto>();
             CreateMap<IssueType, IssueTypeDto>();
+            CreateMap<CreateIssueTypeDto, IssueType>();
             CreateMap<CreateIssueCommentDto, IssueComment>();
             CreateMap<CreateIssueCustomFieldDto, IssueCustomField>();
             CreateMap<BoardDto, Board>();
@@ -42,6 +43,7 @@ namespace ProjectService.RequestHelpers
             CreateMap<UpdateIssueCommentDto, IssueComment>();
             CreateMap<UpdateIssueCustomFieldDto, IssueCustomField>();
             CreateMap<Issue, IssueDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IssuePriorityName, opt => opt.MapFrom(src => src.IssuePriority.PriorityName))
                 .ForMember(dest => dest.IssueStatusName, opt => opt.MapFrom(src => src.IssueStatus.StatusName))
                 .ForMember(dest => dest.IssueTypeName, opt => opt.MapFrom(src => src.IssueType.IssueTypeName))

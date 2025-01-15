@@ -42,6 +42,7 @@ namespace ProjectService.Data
                 .HasForeignKey(c => c.StatusId) // Foreign key in Components
                 .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
 
+
             modelBuilder.Entity<Issue>()
                 .HasOne(s => s.IssuePriority) // navigation property to issues
                 .WithMany(p => p.Issues) // inverse navigation to issues

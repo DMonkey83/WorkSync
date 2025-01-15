@@ -1,11 +1,21 @@
 services:
-  postgres:
-    image: postgres
+  # postgres:
+  #   image: postgres
+  #   environment:
+  #     - POSTGRES_PASSWORD=valuepostgres
+  #   ports:
+  #     - "5433:5433"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  mongodb:
+    image: mongo
     environment:
-      - POSTGRES_PASSWORD=valuepostgres
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongopw
     ports:
-      - "5433:5433"
+      - "27017:27017"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mongodata:/var/lib/mongo/data
 volumes:
-  pgdata:
+  # pgdata:
+  mongodata:
