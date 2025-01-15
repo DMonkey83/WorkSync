@@ -12,8 +12,8 @@ using ProjectService.Data;
 namespace ProjectService.Data.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20241220200118_updated DBContext with board")]
-    partial class updatedDBContextwithboard
+    [Migration("20250115012005_INitial")]
+    partial class INitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,7 +79,7 @@ namespace ProjectService.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AssigneeId")
+                    b.Property<Guid?>("AssigneeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("BoardId")
@@ -106,7 +106,10 @@ namespace ProjectService.Data.Migrations
                     b.Property<int>("OriginalEstimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("PriorityId")
+                    b.Property<Guid?>("ParentIssueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PriorityId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ProjectId")
@@ -115,7 +118,7 @@ namespace ProjectService.Data.Migrations
                     b.Property<int>("RemainingEstimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ReporterId")
+                    b.Property<Guid?>("ReporterId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("SprintId")
@@ -140,6 +143,8 @@ namespace ProjectService.Data.Migrations
                     b.HasIndex("ComponentId");
 
                     b.HasIndex("IssueTypeId");
+
+                    b.HasIndex("ParentIssueId");
 
                     b.HasIndex("PriorityId");
 
@@ -406,14 +411,18 @@ namespace ProjectService.Data.Migrations
                     b.HasOne("ProjectService.Entities.IssueType", "IssueType")
                         .WithMany("Issues")
                         .HasForeignKey("IssueTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("ProjectService.Entities.Issue", "ParentIssue")
+                        .WithMany()
+                        .HasForeignKey("ParentIssueId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ProjectService.Entities.IssuePriority", "IssuePriority")
                         .WithMany("Issues")
                         .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ProjectService.Entities.Project", "Project")
                         .WithMany()
@@ -424,7 +433,7 @@ namespace ProjectService.Data.Migrations
                     b.HasOne("ProjectService.Entities.Sprint", "Sprint")
                         .WithMany("Issues")
                         .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("ProjectService.Entities.IssueStatus", "IssueStatus")
@@ -440,6 +449,8 @@ namespace ProjectService.Data.Migrations
                     b.Navigation("IssueStatus");
 
                     b.Navigation("IssueType");
+
+                    b.Navigation("ParentIssue");
 
                     b.Navigation("Project");
 

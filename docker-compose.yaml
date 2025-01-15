@@ -1,12 +1,13 @@
 services:
-  # postgres:
-  #   image: postgres
-  #   environment:
-  #     - POSTGRES_PASSWORD=valuepostgres
-  #   ports:
-  #     - "5433:5433"
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=Lon19ska83
+      - POSTGRES_USER=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   mongodb:
     image: mongo
     environment:
@@ -17,5 +18,8 @@ services:
     volumes:
       - mongodata:/var/lib/mongo/data
 volumes:
-  # pgdata:
+  pgdata:
   mongodata:
+  
+  
+  

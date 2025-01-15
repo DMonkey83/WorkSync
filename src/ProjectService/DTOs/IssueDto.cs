@@ -4,6 +4,7 @@ namespace ProjectService.DTOs
     {
         public Guid Id { get; set; }
         public Guid? ParentIssueId { get; set; }
+        public Guid? ProjectId { get; set; }
         public string IssueKey { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }

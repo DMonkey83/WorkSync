@@ -36,19 +36,6 @@ namespace ProjectService.Data
                 .HasIndex(p => p.ProjectKey)
                 .IsUnique();
 
-            modelBuilder.Entity<Issue>()
-                .HasOne(s => s.IssueStatus) // navigation property to issues
-                .WithMany(p => p.Issues) // inverse navigation to issues
-                .HasForeignKey(c => c.StatusId) // Foreign key in Components
-                .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
-
-
-            modelBuilder.Entity<Issue>()
-                .HasOne(s => s.IssuePriority) // navigation property to issues
-                .WithMany(p => p.Issues) // inverse navigation to issues
-                .HasForeignKey(c => c.PriorityId) // Foreign key in Components
-                .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
-
             modelBuilder.Entity<IssueLabel>()
                 .HasOne(i => i.Issue) // navigation property to issues
                 .WithMany(p => p.IssueLabels) // inverse navigation to issues
@@ -67,17 +54,58 @@ namespace ProjectService.Data
                 .HasForeignKey(c => c.IssueId) // Foreign key in Components
                 .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
 
-            modelBuilder.Entity<Issue>()
-                .HasOne(s => s.IssueType) // navigation property to issues
-                .WithMany(p => p.Issues) // inverse navigation to issues
-                .HasForeignKey(c => c.IssueTypeId) // Foreign key in Components
-                .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
+
 
             modelBuilder.Entity<Issue>()
-                .HasOne(s => s.IssueType) // navigation property to issues
-                .WithMany(p => p.Issues) // inverse navigation to issues
-                .HasForeignKey(c => c.IssueTypeId) // Foreign key in Components
-                .OnDelete(DeleteBehavior.Cascade); // Optional cascade delete
+                .HasOne(i => i.ParentIssue)
+                .WithMany()
+                .HasForeignKey(i => i.ParentIssueId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Issue>()
+                .HasOne(i => i.IssueType)
+                .WithMany(p => p.Issues)
+                .HasForeignKey(i => i.IssueTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Issue>()
+                .HasOne(i => i.IssuePriority)
+                .WithMany(p => p.Issues)
+                .HasForeignKey(i => i.PriorityId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Issue>()
+                .HasOne(i => i.IssueStatus)
+                .WithMany(p => p.Issues)
+                .HasForeignKey(i => i.StatusId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Issue>()
+                .HasOne(i => i.Component)
+                .WithMany(p => p.Issues)
+                .HasForeignKey(i => i.ComponentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Issue>()
+                .HasOne(i => i.Sprint)
+                .WithMany(p => p.Issues)
+                .HasForeignKey(i => i.SprintId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Issue>()
+                .HasMany(i => i.IssueLabels)
+                .WithOne(p=>p.Issue)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Issue>()
+                .HasMany(i => i.IssueComments)
+                .WithOne(p => p.Issue)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Issue>()
+                .HasMany(i => i.IssueCustomFields)
+                .WithOne(p => p.Issue)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

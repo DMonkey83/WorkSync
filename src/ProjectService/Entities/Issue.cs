@@ -15,7 +15,7 @@ namespace ProjectService.Entities
         [ForeignKey(nameof(Project))]
         public Guid ProjectId { get; set; }
         [ForeignKey(nameof(Issue))]
-        public Guid? ParentIssueId { get; set; } = null;
+        public Guid? ParentIssueId { get; set; }
         [ForeignKey(nameof(IssueType))]
         public Guid IssueTypeId { get; set; }
         public Guid? ReporterId { get; set; }

@@ -6,11 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectService.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class INitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Boards",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BoardName = table.Column<string>(type: "text", nullable: true),
+                    BoardType = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Boards", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "IssuePriorities",
                 columns: table => new
@@ -21,6 +35,19 @@ namespace ProjectService.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IssuePriorities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IssueSequences",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastNumber = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueSequences", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -118,13 +145,15 @@ namespace ProjectService.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ParentIssueId = table.Column<Guid>(type: "uuid", nullable: true),
                     IssueTypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReporterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AssigneeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PriorityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReporterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    AssigneeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    PriorityId = table.Column<Guid>(type: "uuid", nullable: true),
                     StatusId = table.Column<Guid>(type: "uuid", nullable: false),
                     ComponentId = table.Column<Guid>(type: "uuid", nullable: false),
                     SprintId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IssueKey = table.Column<string>(type: "text", nullable: true),
                     Summary = table.Column<string>(type: "text", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -132,11 +161,17 @@ namespace ProjectService.Data.Migrations
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     OriginalEstimate = table.Column<int>(type: "integer", nullable: false),
                     RemainingEstimate = table.Column<int>(type: "integer", nullable: false),
-                    TimeSpent = table.Column<int>(type: "integer", nullable: false)
+                    TimeSpent = table.Column<int>(type: "integer", nullable: false),
+                    BoardId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Issues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Issues_Boards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "Boards",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Issues_Components_ComponentId",
                         column: x => x.ComponentId,
@@ -148,7 +183,7 @@ namespace ProjectService.Data.Migrations
                         column: x => x.PriorityId,
                         principalTable: "IssuePriorities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Issues_IssueStatuses_StatusId",
                         column: x => x.StatusId,
@@ -160,7 +195,13 @@ namespace ProjectService.Data.Migrations
                         column: x => x.IssueTypeId,
                         principalTable: "IssueTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Issues_Issues_ParentIssueId",
+                        column: x => x.ParentIssueId,
+                        principalTable: "Issues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Issues_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -172,7 +213,7 @@ namespace ProjectService.Data.Migrations
                         column: x => x.SprintId,
                         principalTable: "Sprints",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -284,6 +325,11 @@ namespace ProjectService.Data.Migrations
                 column: "IssueId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Issues_BoardId",
+                table: "Issues",
+                column: "BoardId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Issues_ComponentId",
                 table: "Issues",
                 column: "ComponentId");
@@ -292,6 +338,11 @@ namespace ProjectService.Data.Migrations
                 name: "IX_Issues_IssueTypeId",
                 table: "Issues",
                 column: "IssueTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_ParentIssueId",
+                table: "Issues",
+                column: "ParentIssueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Issues_PriorityId",
@@ -312,6 +363,12 @@ namespace ProjectService.Data.Migrations
                 name: "IX_Issues_StatusId",
                 table: "Issues",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_ProjectKey",
+                table: "Projects",
+                column: "ProjectKey",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sprints_ProjectId",
@@ -335,7 +392,13 @@ namespace ProjectService.Data.Migrations
                 name: "IssueLabels");
 
             migrationBuilder.DropTable(
+                name: "IssueSequences");
+
+            migrationBuilder.DropTable(
                 name: "Issues");
+
+            migrationBuilder.DropTable(
+                name: "Boards");
 
             migrationBuilder.DropTable(
                 name: "Components");

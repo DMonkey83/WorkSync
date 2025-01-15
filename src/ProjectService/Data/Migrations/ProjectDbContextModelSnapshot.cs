@@ -39,7 +39,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Boards", (string)null);
+                    b.ToTable("Boards");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>
@@ -67,7 +67,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Components", (string)null);
+                    b.ToTable("Components");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Issue", b =>
@@ -151,7 +151,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Issues", (string)null);
+                    b.ToTable("Issues");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueComment", b =>
@@ -176,7 +176,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueComments", (string)null);
+                    b.ToTable("IssueComments");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueCustomField", b =>
@@ -198,7 +198,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueCustomFields", (string)null);
+                    b.ToTable("IssueCustomFields");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueHistory", b =>
@@ -229,7 +229,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueHistories", (string)null);
+                    b.ToTable("IssueHistories");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueLabel", b =>
@@ -248,7 +248,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("IssueId");
 
-                    b.ToTable("IssueLabels", (string)null);
+                    b.ToTable("IssueLabels");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssuePriority", b =>
@@ -262,7 +262,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssuePriorities", (string)null);
+                    b.ToTable("IssuePriorities");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueSequence", b =>
@@ -279,7 +279,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueSequences", (string)null);
+                    b.ToTable("IssueSequences");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueStatus", b =>
@@ -293,7 +293,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueStatuses", (string)null);
+                    b.ToTable("IssueStatuses");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssueType", b =>
@@ -310,7 +310,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IssueTypes", (string)null);
+                    b.ToTable("IssueTypes");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Project", b =>
@@ -348,7 +348,7 @@ namespace ProjectService.Data.Migrations
                     b.HasIndex("ProjectKey")
                         .IsUnique();
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Sprint", b =>
@@ -379,7 +379,7 @@ namespace ProjectService.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Sprints", (string)null);
+                    b.ToTable("Sprints");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.Component", b =>
@@ -408,18 +408,18 @@ namespace ProjectService.Data.Migrations
                     b.HasOne("ProjectService.Entities.IssueType", "IssueType")
                         .WithMany("Issues")
                         .HasForeignKey("IssueTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ProjectService.Entities.Issue", "ParentIssue")
-                        .WithMany("SubIssues")
+                        .WithMany()
                         .HasForeignKey("ParentIssueId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ProjectService.Entities.IssuePriority", "IssuePriority")
                         .WithMany("Issues")
                         .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("ProjectService.Entities.Project", "Project")
                         .WithMany()
@@ -430,7 +430,7 @@ namespace ProjectService.Data.Migrations
                     b.HasOne("ProjectService.Entities.Sprint", "Sprint")
                         .WithMany("Issues")
                         .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("ProjectService.Entities.IssueStatus", "IssueStatus")
@@ -526,8 +526,6 @@ namespace ProjectService.Data.Migrations
                     b.Navigation("IssueCustomFields");
 
                     b.Navigation("IssueLabels");
-
-                    b.Navigation("SubIssues");
                 });
 
             modelBuilder.Entity("ProjectService.Entities.IssuePriority", b =>
