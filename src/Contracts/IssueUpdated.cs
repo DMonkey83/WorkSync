@@ -1,9 +1,11 @@
-namespace ProjectService.DTOs
+namespace Contracts
 {
-    public class UpdateIssueDto
+    public class IssueUpdated
     {
-        public Guid Id { get; set; }
         public Guid? ProjectId { get; set; }
+        public Guid? ParentIssueId { get; set; }
+        public Guid? BoadId { get; set; }
+        public Guid? Id { get; set; }
         public string IssueKey { get; set; } = null!;
         public Guid? IssueTypeId { get; set; }
         public Guid? ReporterId { get; set; }
@@ -14,8 +16,8 @@ namespace ProjectService.DTOs
         public Guid? SprintId { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }
-        public DateTime? UpdatedAt { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public int? OriginalEstimate { get; set; }
         public int? RemainingEstimate { get; set; }
         public int? TimeSpent { get; set; }

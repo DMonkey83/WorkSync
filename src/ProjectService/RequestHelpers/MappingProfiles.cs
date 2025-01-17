@@ -1,10 +1,11 @@
 using AutoMapper;
+using Contracts;
 using ProjectService.DTOs;
 using ProjectService.Entities;
 
 namespace ProjectService.RequestHelpers
 {
-    public class MappingProfiles: Profile
+    public class MappingProfiles : Profile
     {
         public MappingProfiles()
         {
@@ -29,7 +30,7 @@ namespace ProjectService.RequestHelpers
                 .ForMember(dest => dest.EndDate, opt => opt.Ignore());
             CreateMap<IssueComment, IssueCommentDto>();
             CreateMap<IssueCustomField, IssueCustomFieldDto>();
-            CreateMap<IssueLabel, IssueLabelDto>();
+            CreateMap<Entities.IssueLabel, IssueLabelDto>();
             CreateMap<IssuePriority, IssuePriorityDto>();
             CreateMap<IssueSequence, IssueSequenceDto>();
             CreateMap<IssueStatus, IssueStatusDto>();
@@ -42,6 +43,15 @@ namespace ProjectService.RequestHelpers
             CreateMap<UpdateBoardDto, Board>();
             CreateMap<UpdateIssueCommentDto, IssueComment>();
             CreateMap<UpdateIssueCustomFieldDto, IssueCustomField>();
+            CreateMap<IssueDto, IssueCreated>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Handle timestamps in service or database
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
+            CreateMap<UpdateIssueDto, Issue>();
+            CreateMap<Issue, IssueUpdated>()
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                 .ForMember(dest => dest.IssueKey, opt => opt.MapFrom(src => src.IssueKey));
+            CreateMap<Issue, IssueDeleted>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             CreateMap<Issue, IssueDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IssuePriorityName, opt => opt.MapFrom(src => src.IssuePriority.PriorityName))
@@ -58,6 +68,6 @@ namespace ProjectService.RequestHelpers
                 .ForMember(dest => dest.IssueCustomFields, opt => opt.Ignore());
 
         }
-        
+
     } //
 }

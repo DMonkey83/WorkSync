@@ -1,12 +1,8 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Entities;
-
-namespace SearchService.Models
+namespace Contracts
 {
-    public class Issue : Entity
+    public class IssueCreated
     {
-
+        public Guid Id { get; set; } // Use Guid as the data type:w
         public string IssueKey { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }

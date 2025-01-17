@@ -1,4 +1,4 @@
-namespace SearchService.Models
+namespace Contracts
 {
     public class IssueLabel
     {

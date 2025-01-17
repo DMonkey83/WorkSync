@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using ProjectService.Entities;
 
@@ -94,7 +95,7 @@ namespace ProjectService.Data
 
             modelBuilder.Entity<Issue>()
                 .HasMany(i => i.IssueLabels)
-                .WithOne(p=>p.Issue)
+                .WithOne(p => p.Issue)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Issue>()
@@ -107,8 +108,14 @@ namespace ProjectService.Data
                 .WithOne(p => p.Issue)
                 .OnDelete(DeleteBehavior.Cascade);
 
+
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
         }
+
 
         public override int SaveChanges()
         {
@@ -128,6 +135,7 @@ namespace ProjectService.Data
         {
             lock (_lock)
             {
+                // Handle newly added issues
                 var newIssues = ChangeTracker.Entries<Issue>()
                     .Where(e => e.State == EntityState.Added && string.IsNullOrEmpty(e.Entity.IssueKey))
                     .Select(e => e.Entity)
@@ -135,27 +143,54 @@ namespace ProjectService.Data
 
                 foreach (var issue in newIssues)
                 {
-                    var project = Projects.Find(issue.ProjectId);
-                    if (project == null)
-                    {
-                        throw new InvalidOperationException("Project not found");
-                    }
+                    GenerateKeyForIssue(issue);
+                }
 
-                    var issueSequence = IssueSequences.FirstOrDefault(seq => seq.ProjectId == project.Id);
-                    if (issueSequence == null)
-                    {
-                        issueSequence = new IssueSequence
-                        {
-                            ProjectId = issue.ProjectId,
-                            LastNumber = 0
-                        };
-                        IssueSequences.Add(issueSequence);
-                    }
+                // Handle updated issues where ProjectId has changed
+                var updatedIssues = ChangeTracker.Entries<Issue>()
+                    .Where(e => e.State == EntityState.Modified &&
+                                e.Property(p => p.ProjectId).IsModified)
+                    .ToList();
 
-                    issueSequence.LastNumber++;
-                    issue.IssueKey = $"{project.ProjectKey}-{issueSequence.LastNumber:D4}";
+                foreach (var entry in updatedIssues)
+                {
+                    var originalProjectId = (Guid?)entry.OriginalValues[nameof(Issue.ProjectId)];
+                    var currentProjectId = entry.Entity.ProjectId;
+
+                    // Only regenerate the IssueKey if the ProjectId has changed
+                    if (originalProjectId != currentProjectId)
+                    {
+                        GenerateKeyForIssue(entry.Entity);
+                    }
                 }
             }
         }
+
+        private void GenerateKeyForIssue(Issue issue)
+        {
+            var project = Projects.Find(issue.ProjectId);
+            if (project == null)
+            {
+                throw new InvalidOperationException("Project not found");
+            }
+
+            var issueSequence = IssueSequences.FirstOrDefault(seq => seq.ProjectId == project.Id);
+            if (issueSequence == null)
+            {
+                issueSequence = new IssueSequence
+                {
+                    ProjectId = issue.ProjectId,
+                    LastNumber = 0
+                };
+                IssueSequences.Add(issueSequence);
+            }
+
+            issueSequence.LastNumber++;
+            issue.IssueKey = $"{project.ProjectKey}-{issueSequence.LastNumber:D4}";
+            Console.WriteLine($"Generated Issue Key: {issue.IssueKey}");
+        }
+
+
+
     }
 }

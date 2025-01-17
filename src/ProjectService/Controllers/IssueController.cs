@@ -1,5 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectService.Data;
@@ -14,11 +16,13 @@ namespace ProjectService.Controllers
     {
         private readonly ProjectDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public IssueController(ProjectDbContext context, IMapper mapper)
+        public IssueController(ProjectDbContext context, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             _context = context;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -102,22 +106,30 @@ namespace ProjectService.Controllers
             issue.CreatedAt = DateTime.UtcNow;
             issue.UpdatedAt = DateTime.UtcNow;
             _context.Issues.Add(issue);
+            var newIssue = _mapper.Map<IssueDto>(issue);
+
+            Console.WriteLine("Publishing IssueCreated event issue Id: ", newIssue.Id);
+
+            await _publishEndpoint.Publish(_mapper.Map<IssueCreated>(newIssue));
             var result = await _context.SaveChangesAsync() > 0;
+
             if (!result)
             {
                 return BadRequest("Could not create issue");
             }
+
             var createdIssue = await _context.Issues
                 .Include(x => x.IssuePriority)
                 .Include(x => x.IssueStatus)
                 .Include(x => x.IssueType)
-                .FirstOrDefaultAsync(i => i.Id == issue.Id);
+                .FirstOrDefaultAsync(i => i.Id == newIssue.Id);
             return CreatedAtAction(nameof(GetIssueById), new { id = issue.Id }, _mapper.Map<IssueDto>(createdIssue));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<IssueDto>> UpdateIssue(Guid id, UpdateIssueDto updateIssueDto)
         {
+            // Fetch the issue, including related entities
             var issue = await _context.Issues
                 .Include(x => x.IssuePriority)
                 .Include(x => x.IssueStatus)
@@ -128,11 +140,13 @@ namespace ProjectService.Controllers
                 .Include(x => x.Sprint)
                 .Include(x => x.Project)
                 .FirstOrDefaultAsync(i => i.Id == id);
+
             if (issue == null)
             {
                 return NotFound();
             }
 
+            // Update properties with values from the DTO, if present
             issue.ComponentId = updateIssueDto.ComponentId ?? issue.ComponentId;
             issue.Description = updateIssueDto.Description ?? issue.Description;
             issue.PriorityId = updateIssueDto.PriorityId ?? issue.PriorityId;
@@ -141,37 +155,78 @@ namespace ProjectService.Controllers
             issue.StatusId = updateIssueDto.StatusId ?? issue.StatusId;
             issue.Summary = updateIssueDto.Summary ?? issue.Summary;
             issue.IssueTypeId = updateIssueDto.IssueTypeId ?? issue.IssueTypeId;
-            issue.UpdatedAt = DateTime.UtcNow;
             issue.TimeSpent = updateIssueDto.TimeSpent ?? issue.TimeSpent;
             issue.OriginalEstimate = updateIssueDto.OriginalEstimate ?? issue.OriginalEstimate;
             issue.RemainingEstimate = updateIssueDto.RemainingEstimate ?? issue.RemainingEstimate;
             issue.DueDate = updateIssueDto.DueDate ?? issue.DueDate;
 
+            // Update the last modified timestamp
+            issue.UpdatedAt = DateTime.UtcNow;
 
+            // Save changes to the database
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {
                 return BadRequest("Could not update issue");
             }
+
+            // Validate IssueKey before publishing
+            Console.WriteLine($"Publishing IssueUpdated event. IssueKey: {issue.IssueKey}, Id: {issue.Id}");
+            var updatedIssue = new UpdateIssueDto
+            {
+                IssueKey = issue.IssueKey,
+                Id = issue.Id,
+                ProjectId = issue.ProjectId,
+                IssueTypeId = issue.IssueTypeId,
+                ReporterId = issue.ReporterId,
+                AssigneeId = issue.AssigneeId,
+                PriorityId = issue.PriorityId,
+                StatusId = issue.StatusId,
+                ComponentId = issue.ComponentId,
+                SprintId = issue.SprintId,
+                Summary = issue.Summary,
+                Description = issue.Description,
+                DueDate = issue.DueDate,
+                OriginalEstimate = issue.OriginalEstimate,
+                RemainingEstimate = issue.RemainingEstimate,
+                TimeSpent = issue.TimeSpent,
+                UpdatedAt = issue.UpdatedAt
+            };
+            // Publish the IssueUpdated event
+            await _publishEndpoint.Publish<IssueUpdated>(updatedIssue);
+
+            // Return the updated issue DTO
             return Ok(_mapper.Map<IssueDto>(issue));
         }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteIssue(Guid id)
         {
-            var issue = await _context.Issues
-                .FirstOrDefaultAsync(i => i.Id == id);
+            var issue = await _context.Issues.FirstOrDefaultAsync(i => i.Id == id);
             if (issue == null)
             {
                 return NotFound();
             }
+
             _context.Issues.Remove(issue);
+
+            // Create the IssueDeleted event object
+            var issueDeleted = new IssueDeleted
+            {
+                Id = issue.Id.ToString() // Assuming IssueDeleted.Id is a string
+            };
+
+            // Publish the event
+            await _publishEndpoint.Publish(issueDeleted);
+
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
             {
                 return BadRequest("Could not delete issue");
             }
-            return Ok("Issue deleted $issue.IssueKey");
+
+            return Ok($"Issue deleted {issue.IssueKey}");
         }
 
     }
