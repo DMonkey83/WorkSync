@@ -14,6 +14,7 @@ namespace SearchService.Data
                 .FromConnectionString("mongodb://root:mongopw@localhost:27017"));
             await DB.Index<Issue>()
                 .Key(i => i.IssueKey, KeyType.Text)
+                .Key(i => i.ParentIssueId, KeyType.Text)
                 .Key(i => i.UpdatedAt, KeyType.Text)
                 .Key(i => i.IssuePriorityName, KeyType.Text)
                 .Key(i => i.IssueStatusName, KeyType.Text)

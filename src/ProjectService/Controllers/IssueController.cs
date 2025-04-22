@@ -170,30 +170,27 @@ namespace ProjectService.Controllers
                 return BadRequest("Could not update issue");
             }
 
-            // Validate IssueKey before publishing
-            Console.WriteLine($"Publishing IssueUpdated event. IssueKey: {issue.IssueKey}, Id: {issue.Id}");
-            var updatedIssue = new UpdateIssueDto
+            var updatedIssue = _mapper.Map<IssueUpdated>(new IssueUpdated
             {
-                IssueKey = issue.IssueKey,
                 Id = issue.Id,
+                IssueKey = issue.IssueKey,
                 ProjectId = issue.ProjectId,
-                IssueTypeId = issue.IssueTypeId,
-                ReporterId = issue.ReporterId,
-                AssigneeId = issue.AssigneeId,
-                PriorityId = issue.PriorityId,
-                StatusId = issue.StatusId,
-                ComponentId = issue.ComponentId,
-                SprintId = issue.SprintId,
+                IssuePriorityName = issue.IssuePriority.PriorityName,
+                IssueStatusName = issue.IssueStatus.StatusName,
+                IssueTypeName = issue.IssueType.IssueTypeName,
                 Summary = issue.Summary,
                 Description = issue.Description,
-                DueDate = issue.DueDate,
+                DueDate = issue.DueDate.Value,
                 OriginalEstimate = issue.OriginalEstimate,
                 RemainingEstimate = issue.RemainingEstimate,
                 TimeSpent = issue.TimeSpent,
-                UpdatedAt = issue.UpdatedAt
-            };
+                UpdatedAt = issue.UpdatedAt.Value
+            });
+
+            // Validate IssueKey before publishing
+            Console.WriteLine($"Publishing IssueUpdated event. IssueKey: {issue.IssueKey}, Id: {issue.Id}");
             // Publish the IssueUpdated event
-            await _publishEndpoint.Publish<IssueUpdated>(updatedIssue);
+            await _publishEndpoint.Publish(_mapper.Map<IssueUpdated>(updatedIssue));
 
             // Return the updated issue DTO
             return Ok(_mapper.Map<IssueDto>(issue));

@@ -47,9 +47,20 @@ namespace ProjectService.RequestHelpers
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Handle timestamps in service or database
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
             CreateMap<UpdateIssueDto, Issue>();
-            CreateMap<Issue, IssueUpdated>()
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                 .ForMember(dest => dest.IssueKey, opt => opt.MapFrom(src => src.IssueKey));
+            CreateMap<IssueDto, IssueUpdated>()
+                .ForMember(dest => dest.IssueKey, opt => opt.MapFrom(src => src.IssueKey))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ProjectId, opt => opt.MapFrom(src => src.ProjectId))
+                .ForMember(dest => dest.IssuePriorityName, opt => opt.MapFrom(src => src.IssuePriorityName))
+                .ForMember(dest => dest.IssueStatusName, opt => opt.MapFrom(src => src.IssueStatusName))
+                .ForMember(dest => dest.IssueTypeName, opt => opt.MapFrom(src => src.IssueTypeName))
+                .ForMember(dest => dest.Summary, opt => opt.MapFrom(src => src.Summary))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate))
+                .ForMember(dest => dest.OriginalEstimate, opt => opt.MapFrom(src => src.OriginalEstimate))
+                .ForMember(dest => dest.RemainingEstimate, opt => opt.MapFrom(src => src.RemainingEstimate))
+                .ForMember(dest => dest.TimeSpent, opt => opt.MapFrom(src => src.TimeSpent))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
             CreateMap<Issue, IssueDeleted>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             CreateMap<Issue, IssueDto>()

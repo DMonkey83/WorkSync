@@ -14,9 +14,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient<IssueSvcHttpClient>().AddPolicyHandler(GetPolicy());
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<IssueCreatedConsumer>();
-    x.AddConsumer<IssueDeletedConsumer>();
-    x.AddConsumer<IssueUpdatedConsumer>();
+    x.AddConsumersFromNamespaceContaining<IssueCreatedConsumer>();
+    x.AddConsumer<IssueUpdatedConsumer>(); 
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search-service", false));
 

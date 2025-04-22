@@ -7,6 +7,8 @@ namespace SearchService.Models
     public class Issue : Entity
     {
 
+        public string ParentIssueId { get; set; }
+        public string ProjectId { get; set; }
         public string IssueKey { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }

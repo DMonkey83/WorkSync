@@ -2,24 +2,21 @@ namespace Contracts
 {
     public class IssueUpdated
     {
-        public Guid? ProjectId { get; set; }
+        public Guid Id { get; set; }
         public Guid? ParentIssueId { get; set; }
-        public Guid? BoadId { get; set; }
-        public Guid? Id { get; set; }
-        public string IssueKey { get; set; } = null!;
-        public Guid? IssueTypeId { get; set; }
-        public Guid? ReporterId { get; set; }
-        public Guid? AssigneeId { get; set; }
-        public Guid? PriorityId { get; set; }
-        public Guid? StatusId { get; set; }
-        public Guid? ComponentId { get; set; }
-        public Guid? SprintId { get; set; }
+        public Guid? ProjectId { get; set; }
+        public string IssueKey { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }
-        public DateTime? DueDate { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public int? OriginalEstimate { get; set; }
-        public int? RemainingEstimate { get; set; }
-        public int? TimeSpent { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime DueDate { get; set; }
+        public int OriginalEstimate { get; set; }
+        public int RemainingEstimate { get; set; }
+        public int TimeSpent { get; set; }
+        public string IssuePriorityName { get; set; }
+        public string IssueStatusName { get; set; }
+        public string IssueTypeName { get; set; }
+        public List<IssueLabel> IssueLabels { get; set; }
     }
 }
