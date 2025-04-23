@@ -58,7 +58,8 @@ namespace IdentityService.Pages.Register
                 {
                     await _userManager.AddClaimsAsync(user,
                     [
-                        new Claim(JwtClaimTypes.Name, Input.FullName)
+                        new Claim(JwtClaimTypes.Name, Input.FullName),
+                        new Claim(JwtClaimTypes.Id, user.Id.ToString()),
                     ]);
 
                     RegisterSuccess = true;

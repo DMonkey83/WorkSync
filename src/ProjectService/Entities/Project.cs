@@ -11,7 +11,7 @@ namespace ProjectService.Entities
         public Guid Id { get; set; }
         public string ProjectName { get; set; }
         public string ProjectKey { get; set; }
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
         public Guid LeadUserId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? StartDate { get; set; }

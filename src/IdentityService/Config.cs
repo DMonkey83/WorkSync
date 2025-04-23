@@ -15,7 +15,6 @@ public static class Config
         new ApiScope[]
         {
             new ApiScope("ProjectManagementApp.Api", "Project Management API"),
-            new ApiScope("scope2"),
         };
 
     public static IEnumerable<Client> Clients =>

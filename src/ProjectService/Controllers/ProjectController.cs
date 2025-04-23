@@ -1,4 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectService.Data;
@@ -13,9 +17,11 @@ namespace ProjectService.Controllers
     {
         private readonly ProjectDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProjectController> _logger;
 
-        public ProjectController(ProjectDbContext context, IMapper mapper)
+        public ProjectController(ProjectDbContext context, IMapper mapper, ILogger<ProjectController> logger)
         {
+            _logger = logger;
             _context = context;
             _mapper = mapper;
         }
@@ -40,23 +46,39 @@ namespace ProjectService.Controllers
                 return NotFound();
             }
 
+
             var projectDto = _mapper.Map<ProjectDto>(project);
             return Ok(projectDto);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<ProjectDto>> CreateProject(CreateProjectDto createProjectDto)
         {
-            try{
-            var project = _mapper.Map<Project>(createProjectDto);
-            project.Status = ProjectStatus.NotStarted;
-            _context.Projects.Add(project);
-            var result = await _context.SaveChangesAsync() > 0;
-            if (!result)
+            try
             {
-                return BadRequest("Could not create project");
-            }
-            return CreatedAtAction(nameof(GetProjectById), new { id = project.Id }, _mapper.Map<ProjectDto>(project));
+                var claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+                _logger.LogDebug("User claims: {Claims}", string.Join(", ", claims));
+
+                // Retrieve nameidentifier claim
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdClaim, out var leadUserId))
+                {
+                    _logger.LogWarning("Invalid or missing nameidentifier claim. Found claims: {Claims}", string.Join(", ", claims));
+                    return Unauthorized("Invalid user ID in token.");
+                }
+
+                var project = _mapper.Map<Project>(createProjectDto);
+                project.Status = ProjectStatus.NotStarted;
+                Console.WriteLine("LeadUserId: " + leadUserId);
+                project.LeadUserId = leadUserId;
+                _context.Projects.Add(project);
+                var result = await _context.SaveChangesAsync() > 0;
+                if (!result)
+                {
+                    return BadRequest("Could not create project");
+                }
+                return CreatedAtAction(nameof(GetProjectById), new { id = project.Id }, _mapper.Map<ProjectDto>(project));
 
             }
             catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
@@ -69,6 +91,7 @@ namespace ProjectService.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateProject(Guid id, UpdateProjectDto updateProjectDto)
         {
@@ -78,7 +101,18 @@ namespace ProjectService.Controllers
             {
                 return NotFound();
             }
-            // TODO: check lead user id
+            var claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+            _logger.LogDebug("User claims: {Claims}", string.Join(", ", claims));
+
+            // Retrieve nameidentifier claim
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+            {
+                _logger.LogWarning("Invalid or missing nameidentifier claim. Found claims: {Claims}", string.Join(", ", claims));
+                return Unauthorized("Invalid user ID in token.");
+            }
+          
+            if (project.LeadUserId != userId) return Forbid("You are not authorized to update this project.");
             project.ProjectName = updateProjectDto.ProjectName ?? project.ProjectName;
             project.Description = updateProjectDto.Description ?? project.Description;
             project.StartDate = updateProjectDto.StartDate ?? project.StartDate;
@@ -95,6 +129,7 @@ namespace ProjectService.Controllers
 
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProject(Guid id)
         {
@@ -103,7 +138,17 @@ namespace ProjectService.Controllers
             {
                 return NotFound();
             }
+              var claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+            _logger.LogDebug("User claims: {Claims}", string.Join(", ", claims));
 
+            // Retrieve nameidentifier claim
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+            {
+                _logger.LogWarning("Invalid or missing nameidentifier claim. Found claims: {Claims}", string.Join(", ", claims));
+                return Unauthorized("Invalid user ID in token.");
+            }
+            if (project.LeadUserId != userId) return Forbid("You are not authorized to delete this project.");
             _context.Projects.Remove(project);
             var result = await _context.SaveChangesAsync() > 0;
             if (!result)
@@ -114,7 +159,7 @@ namespace ProjectService.Controllers
             return Ok();
         }
 
-          private bool IsUniqueConstraintViolation(DbUpdateException ex)
+        private static bool IsUniqueConstraintViolation(DbUpdateException ex)
         {
             if (ex.InnerException is Npgsql.PostgresException postgresException) // For PostgreSQL
             {
